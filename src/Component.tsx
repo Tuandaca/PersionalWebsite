@@ -83,6 +83,11 @@ export interface ForceFieldBackgroundProps {
    */
   restoreSpeed?: number;
   /**
+   * Cursor follow responsiveness (0 to 1, higher = faster/snappier, 1 = instant)
+   * @default 0.85
+   */
+  magnifierInertia?: number;
+  /**
    * Additional CSS class names
    */
   className?: string;
@@ -143,10 +148,16 @@ function createFallbackImagePattern(): string {
 
 /**
  * ForceFieldBackground
- * 
+ *
  * An interactive, particle-based background that reacts to mouse movement.
  * It uses an underlying image to determine particle color and size, creating
  * a "force field" effect where particles are pushed away by the cursor.
+ *
+ * Physics engine v2:
+ * - Trail-based segment distance for smooth fast-swipe effect
+ * - Mouse velocity impulse (particles fly in direction of swipe)
+ * - Zero-allocation physics (no per-frame Vector allocation)
+ * - loadPixels() called only when image changes, not every frame
  */
 export function ForceFieldBackground({
   imageUrl = "https://cdn.pixabay.com/photo/2024/12/13/20/29/alps-9266131_1280.jpg",
@@ -165,6 +176,7 @@ export function ForceFieldBackground({
   forceStrength = 10,
   friction = 0.9,
   restoreSpeed = 0.05,
+  magnifierInertia = 0.85,
   className = "",
 }: ForceFieldBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -174,18 +186,18 @@ export function ForceFieldBackground({
 
   // Keep latest props in ref to access inside p5 closure without re-instantiating
   const propsRef = useRef({
-    hue, saturation, threshold, minStroke, maxStroke, spacing, noiseScale, 
+    hue, saturation, threshold, minStroke, maxStroke, spacing, noiseScale,
     density, invertImage, invertWireframe, magnifierEnabled, magnifierRadius,
-    forceStrength, friction, restoreSpeed
+    forceStrength, friction, restoreSpeed, magnifierInertia
   });
 
   useEffect(() => {
     propsRef.current = {
       hue, saturation, threshold, minStroke, maxStroke, spacing, noiseScale,
       density, invertImage, invertWireframe, magnifierEnabled, magnifierRadius,
-      forceStrength, friction, restoreSpeed
+      forceStrength, friction, restoreSpeed, magnifierInertia
     };
-  }, [hue, saturation, threshold, minStroke, maxStroke, spacing, noiseScale, density, invertImage, invertWireframe, magnifierEnabled, magnifierRadius, forceStrength, friction, restoreSpeed]);
+  }, [hue, saturation, threshold, minStroke, maxStroke, spacing, noiseScale, density, invertImage, invertWireframe, magnifierEnabled, magnifierRadius, forceStrength, friction, restoreSpeed, magnifierInertia]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -198,27 +210,37 @@ export function ForceFieldBackground({
     const sketch = (p: p5) => {
       let originalImg: p5.Image;
       let img: p5.Image;
+      let imgPixels: Uint8ClampedArray | null = null; // cached pixel array
       let palette: p5.Color[] = [];
-      let points: {
-        pos: p5.Vector;
-        originalPos: p5.Vector;
-        vel: p5.Vector;
-      }[] = [];
-      
-      // Internal state tracking to detect changes
+
+      // Use flat typed arrays for particle data — zero GC, cache-friendly
+      // Layout: [posX, posY, origX, origY, velX, velY]
+      let ptPosX: Float32Array = new Float32Array(0);
+      let ptPosY: Float32Array = new Float32Array(0);
+      let ptOrigX: Float32Array = new Float32Array(0);
+      let ptOrigY: Float32Array = new Float32Array(0);
+      let ptVelX: Float32Array = new Float32Array(0);
+      let ptVelY: Float32Array = new Float32Array(0);
+      let ptCount = 0;
+
+      // Internal state tracking to detect prop changes
       let lastHue = -1;
       let lastSaturation = -1;
       let lastSpacing = -1;
       let lastNoiseScale = -1;
       let lastDensity = -1;
       let lastInvertImage: boolean | null = null;
-      let magnifierX = 0;
-      let magnifierY = 0;
-      let magnifierInertia = 0.1;
+
+      // Cursor tracking: current + previous for trail/velocity
+      let curX = 0;
+      let curY = 0;
+      let prevX = 0;
+      let prevY = 0;
       let hasUserInteracted = false;
 
+      // ─── Image loading ────────────────────────────────────────────────────────
+
       p.preload = () => {
-        // Attempt loading image with fallback for CORS or offline
         p.loadImage(
           imageUrl,
           (loadedImg) => {
@@ -226,19 +248,13 @@ export function ForceFieldBackground({
             setIsLoading(false);
           },
           (err) => {
-            console.warn("Failed to load primary image, generating procedural fallback pattern:", err);
+            console.warn("Failed to load primary image, generating procedural fallback:", err);
             const fallbackUrl = createFallbackImagePattern();
             if (fallbackUrl) {
               p.loadImage(
                 fallbackUrl,
-                (fbImg) => {
-                  originalImg = fbImg;
-                  setIsLoading(false);
-                },
-                () => {
-                  setError("Failed to load image");
-                  setIsLoading(false);
-                }
+                (fbImg) => { originalImg = fbImg; setIsLoading(false); },
+                () => { setError("Failed to load image"); setIsLoading(false); }
               );
             } else {
               setError("Failed to load image");
@@ -248,17 +264,16 @@ export function ForceFieldBackground({
         );
       };
 
+      // ─── Setup ────────────────────────────────────────────────────────────────
+
       p.setup = () => {
         if (!containerRef.current) return;
-        
-        // Create canvas to fill parent
-        const clientWidth = containerRef.current.clientWidth || window.innerWidth;
-        const clientHeight = containerRef.current.clientHeight || window.innerHeight;
-        p.createCanvas(clientWidth, clientHeight);
-        
-        // Initialize magnifier position in the center
-        magnifierX = p.width / 2;
-        magnifierY = p.height / 2;
+        const cw = containerRef.current.clientWidth || window.innerWidth;
+        const ch = containerRef.current.clientHeight || window.innerHeight;
+        p.createCanvas(cw, ch);
+
+        curX = prevX = p.width / 2;
+        curY = prevY = p.height / 2;
 
         if (originalImg) {
           processImage();
@@ -269,110 +284,190 @@ export function ForceFieldBackground({
 
       p.windowResized = () => {
         if (!containerRef.current) return;
-        const clientWidth = containerRef.current.clientWidth || window.innerWidth;
-        const clientHeight = containerRef.current.clientHeight || window.innerHeight;
-        if (clientWidth > 0 && clientHeight > 0) {
-          p.resizeCanvas(clientWidth, clientHeight);
-          if (originalImg) {
-            processImage();
-            generatePoints();
-          }
+        const cw = containerRef.current.clientWidth || window.innerWidth;
+        const ch = containerRef.current.clientHeight || window.innerHeight;
+        if (cw > 0 && ch > 0) {
+          p.resizeCanvas(cw, ch);
+          if (originalImg) { processImage(); generatePoints(); }
         }
       };
+
+      // ─── Image processing ─────────────────────────────────────────────────────
 
       function processImage() {
         if (!originalImg) return;
         img = originalImg.get();
-        // Resize image to match canvas for 1:1 pixel mapping
-        if (p.width > 0 && p.height > 0) {
-          img.resize(p.width, p.height);
-        }
+        if (p.width > 0 && p.height > 0) img.resize(p.width, p.height);
         img.filter(p.GRAY);
 
         if (propsRef.current.invertImage) {
           img.loadPixels();
           for (let i = 0; i < img.pixels.length; i += 4) {
-            img.pixels[i] = 255 - img.pixels[i];
+            img.pixels[i]     = 255 - img.pixels[i];
             img.pixels[i + 1] = 255 - img.pixels[i + 1];
             img.pixels[i + 2] = 255 - img.pixels[i + 2];
           }
           img.updatePixels();
         }
+
+        // Cache pixel array once — never call loadPixels() in draw loop
+        img.loadPixels();
+        imgPixels = img.pixels as unknown as Uint8ClampedArray;
+
         lastInvertImage = propsRef.current.invertImage;
       }
+
+      // ─── Palette ──────────────────────────────────────────────────────────────
 
       function generatePalette(h: number, s: number) {
         palette = [];
         p.push();
         p.colorMode(p.HSL);
         for (let i = 0; i < 12; i++) {
-          let lightness = p.map(i, 0, 11, 95, 5);
+          const lightness = p.map(i, 0, 11, 95, 5);
           palette.push(p.color(h, s, lightness));
         }
         p.pop();
       }
 
+      // ─── Point generation ─────────────────────────────────────────────────────
+
       function generatePoints() {
         if (!img) return;
-        points = [];
-        const { spacing, density, noiseScale } = propsRef.current;
-        
-        // Guard against excessive points for smooth 60fps
-        const safeSpacing = Math.max(4, spacing); 
+        const { spacing: sp, density: den, noiseScale: ns } = propsRef.current;
+        const safeSpacing = Math.max(4, sp);
 
+        // Count first to allocate typed arrays exactly once
+        let count = 0;
+        for (let y = 0; y < img.height; y += safeSpacing)
+          for (let x = 0; x < img.width; x += safeSpacing)
+            if (p.random() <= den) count++;
+
+        ptPosX  = new Float32Array(count);
+        ptPosY  = new Float32Array(count);
+        ptOrigX = new Float32Array(count);
+        ptOrigY = new Float32Array(count);
+        ptVelX  = new Float32Array(count);
+        ptVelY  = new Float32Array(count);
+        ptCount = 0;
+
+        // Re-seed random to match the first pass (reproducible grid)
+        p.randomSeed(42);
         for (let y = 0; y < img.height; y += safeSpacing) {
           for (let x = 0; x < img.width; x += safeSpacing) {
-            if (p.random() > density) continue;
-            
-            let nx = noiseScale > 0 ? (p.noise(x * noiseScale, y * noiseScale) - 0.5) : 0;
-            let ny = noiseScale > 0 ? (p.noise((x + 500) * noiseScale, (y + 500) * noiseScale) - 0.5) : 0;
-            let px = x + nx * safeSpacing;
-            let py = y + ny * safeSpacing;
-            
-            points.push({
-              pos: p.createVector(px, py),
-              originalPos: p.createVector(px, py),
-              vel: p.createVector(0, 0)
-            });
+            const skip = p.random() > den;
+            if (skip) continue;
+            const nx = ns > 0 ? (p.noise(x * ns, y * ns) - 0.5) * safeSpacing : 0;
+            const ny = ns > 0 ? (p.noise((x + 500) * ns, (y + 500) * ns) - 0.5) * safeSpacing : 0;
+            ptOrigX[ptCount] = ptPosX[ptCount] = x + nx;
+            ptOrigY[ptCount] = ptPosY[ptCount] = y + ny;
+            ptVelX[ptCount]  = 0;
+            ptVelY[ptCount]  = 0;
+            ptCount++;
           }
         }
-        
-        lastSpacing = spacing;
-        lastNoiseScale = noiseScale;
-        lastDensity = density;
+        p.randomSeed(Date.now()); // restore truly random seed
+
+        lastSpacing   = sp;
+        lastNoiseScale = ns;
+        lastDensity   = den;
       }
 
-      function applyForceField(mx: number, my: number) {
+      // ─── Physics ──────────────────────────────────────────────────────────────
+      //
+      // Key upgrade: apply force based on CLOSEST DISTANCE to the line-segment
+      // swept by the cursor between the previous and current frame.
+      // This means even at 30–60fps, a fast swipe creates a continuous wake of
+      // displaced particles along the full swept path — no more "teleport hole".
+      //
+      // Additionally, we inject mouse velocity as a lateral impulse so particles
+      // fly in the direction the cursor was swiped (like water displaced by a hand).
+
+      function applyForceField(
+        ax: number, ay: number,  // previous cursor pos
+        bx: number, by: number,  // current cursor pos
+        mvx: number, mvy: number // mouse velocity
+      ) {
         const props = propsRef.current;
         if (!props.magnifierEnabled) return;
 
-        for (let pt of points) {
-          // Repel force
-          let dir = p5.Vector.sub(pt.pos, p.createVector(mx, my));
-          let d = dir.mag();
-          
-          if (d < props.magnifierRadius) {
-            dir.normalize();
-            let force = dir.mult(props.forceStrength / Math.max(1, d)); // Avoid div by zero
-            pt.vel.add(force);
+        const fr  = props.friction;
+        const rs  = props.restoreSpeed;
+        const fs  = props.forceStrength;
+        const rad = props.magnifierRadius;
+        const rad2 = rad * rad;
+
+        // Precompute segment AB length²
+        const abx = bx - ax;
+        const aby = by - ay;
+        const abLen2 = abx * abx + aby * aby;
+
+        // Normalised mouse velocity for impulse direction
+        const mvLen = Math.sqrt(mvx * mvx + mvy * mvy);
+        const mvNx  = mvLen > 0.001 ? mvx / mvLen : 0;
+        const mvNy  = mvLen > 0.001 ? mvy / mvLen : 0;
+        // Impulse strength scales with swipe speed (capped to avoid explosion)
+        const impulseStrength = Math.min(mvLen * 0.18, fs * 1.2);
+
+        for (let i = 0; i < ptCount; i++) {
+          const px = ptPosX[i];
+          const py = ptPosY[i];
+
+          // ── Find closest point on segment AB to particle P ──────────────────
+          let cx: number, cy: number;
+          if (abLen2 < 0.01) {
+            // Degenerate segment (cursor not moving) — fall back to point
+            cx = ax; cy = ay;
+          } else {
+            // t is the projection parameter, clamped to [0,1]
+            let t = ((px - ax) * abx + (py - ay) * aby) / abLen2;
+            if (t < 0) t = 0;
+            if (t > 1) t = 1;
+            cx = ax + t * abx;
+            cy = ay + t * aby;
           }
-          
-          // Friction
-          pt.vel.mult(props.friction);
-          
-          // Restore force (spring back to original)
-          let restore = p5.Vector.sub(pt.pos, pt.originalPos).mult(-props.restoreSpeed);
-          pt.vel.add(restore);
-          
-          // Update position
-          pt.pos.add(pt.vel);
+
+          const dx = px - cx;
+          const dy = py - cy;
+          const d2 = dx * dx + dy * dy;
+
+          if (d2 < rad2 && d2 > 0.01) {
+            const d = Math.sqrt(d2);
+
+            // Radial repulsion (push away from trail)
+            const scale = fs / Math.max(1, d);
+            ptVelX[i] += (dx / d) * scale;
+            ptVelY[i] += (dy / d) * scale;
+
+            // Lateral impulse (swipe momentum) — only when cursor is fast
+            if (impulseStrength > 0.1) {
+              const falloff = 1 - d / rad; // stronger near center
+              ptVelX[i] += mvNx * impulseStrength * falloff;
+              ptVelY[i] += mvNy * impulseStrength * falloff;
+            }
+          }
+
+          // ── Spring restore ──────────────────────────────────────────────────
+          const ox = ptOrigX[i];
+          const oy = ptOrigY[i];
+          ptVelX[i] += (ox - ptPosX[i]) * rs;
+          ptVelY[i] += (oy - ptPosY[i]) * rs;
+
+          // ── Friction ────────────────────────────────────────────────────────
+          ptVelX[i] *= fr;
+          ptVelY[i] *= fr;
+
+          // ── Integrate ───────────────────────────────────────────────────────
+          ptPosX[i] += ptVelX[i];
+          ptPosY[i] += ptVelY[i];
         }
       }
 
+      // ─── Draw loop ────────────────────────────────────────────────────────────
+
       p.draw = () => {
         if (!img) {
-          // If loaded after setup
-          if (originalImg && !img) {
+          if (originalImg) {
             processImage();
             generatePalette(propsRef.current.hue, propsRef.current.saturation);
             generatePoints();
@@ -384,90 +479,110 @@ export function ForceFieldBackground({
 
         const props = propsRef.current;
 
-        // Check for prop changes that require regeneration
+        // Regenerate palette / image / points on prop changes
         if (props.hue !== lastHue || props.saturation !== lastSaturation) {
           generatePalette(props.hue, props.saturation);
           lastHue = props.hue;
           lastSaturation = props.saturation;
         }
-
         if (props.invertImage !== lastInvertImage) {
-          processImage(); // This sets lastInvertImage
+          processImage();
         }
-
-        if (props.spacing !== lastSpacing || props.noiseScale !== lastNoiseScale || props.density !== lastDensity) {
+        if (
+          props.spacing !== lastSpacing ||
+          props.noiseScale !== lastNoiseScale ||
+          props.density !== lastDensity
+        ) {
           generatePoints();
         }
 
-        // Support mouse and touch
-        let targetX = p.mouseX;
-        let targetY = p.mouseY;
+        // ── Cursor position ────────────────────────────────────────────────────
+        prevX = curX;
+        prevY = curY;
 
-        // Touch handling fallback
+        let rawX = p.mouseX;
+        let rawY = p.mouseY;
+
+        // Touch support
         if (p.touches && p.touches.length > 0) {
           const t = p.touches[0] as { x?: number; y?: number };
           if (t && typeof t.x === 'number' && typeof t.y === 'number') {
-            targetX = t.x;
-            targetY = t.y;
+            rawX = t.x;
+            rawY = t.y;
             hasUserInteracted = true;
           }
         }
 
-        // Track user interaction
-        if (p.mouseX !== 0 || p.mouseY !== 0) {
-          hasUserInteracted = true;
-        }
+        if (rawX !== 0 || rawY !== 0) hasUserInteracted = true;
 
-        // Idle gentle oscillation if no interaction yet
+        // Idle gentle oscillation when no mouse input yet
         if (!hasUserInteracted) {
           const t = p.millis() * 0.001;
-          targetX = p.width / 2 + Math.cos(t) * (p.width * 0.25);
-          targetY = p.height / 2 + Math.sin(t * 1.5) * (p.height * 0.2);
+          rawX = p.width  / 2 + Math.cos(t)       * (p.width  * 0.25);
+          rawY = p.height / 2 + Math.sin(t * 1.5) * (p.height * 0.2);
         }
 
-        // Lerp for smooth movement of the 'magnifier' center
-        magnifierX = p.lerp(magnifierX, targetX, magnifierInertia);
-        magnifierY = p.lerp(magnifierY, targetY, magnifierInertia);
+        // Lerp for smooth cursor following (inertia prop)
+        const inertia = props.magnifierInertia ?? 0.85;
+        if (inertia >= 0.98) {
+          curX = rawX;
+          curY = rawY;
+        } else {
+          curX = curX + (rawX - curX) * inertia;
+          curY = curY + (rawY - curY) * inertia;
+        }
 
-        applyForceField(magnifierX, magnifierY);
+        // Mouse velocity vector (pixels per frame)
+        const mvx = curX - prevX;
+        const mvy = curY - prevY;
 
-        img.loadPixels();
+        // ── Apply force field using line-segment trail ─────────────────────────
+        applyForceField(prevX, prevY, curX, curY, mvx, mvy);
+
+        // ── Render particles ───────────────────────────────────────────────────
+        if (!imgPixels) return;
         p.noFill();
 
-        for (let pt of points) {
-          let x = pt.pos.x;
-          let y = pt.pos.y;
-          let d = p.dist(x, y, magnifierX, magnifierY);
-          
-          let px = p.constrain(p.floor(x), 0, img.width - 1);
-          let py = p.constrain(p.floor(y), 0, img.height - 1);
-          
-          // Access pixel data (RGBA)
-          let index = (px + py * img.width) * 4;
-          let brightness = img.pixels[index]; 
-          
-          if (brightness === undefined) continue;
+        const imgW = img.width;
+        const imgH = img.height;
+        const thr  = props.threshold;
+        const invert = props.invertWireframe;
+        const palLen = palette.length;
+        const minSt  = props.minStroke;
+        const maxSt  = props.maxStroke;
+        const mEnabled = props.magnifierEnabled;
+        const mRad     = props.magnifierRadius;
 
-          let condition = props.invertWireframe
-            ? brightness < props.threshold
-            : brightness > props.threshold;
+        for (let i = 0; i < ptCount; i++) {
+          const x = ptPosX[i];
+          const y = ptPosY[i];
 
-          if (condition) {
-            let shadeIndex = Math.floor(p.map(brightness, 0, 255, 0, palette.length - 1));
-            shadeIndex = p.constrain(shadeIndex, 0, palette.length - 1);
-            
-            let strokeSize = p.map(brightness, 0, 255, props.minStroke, props.maxStroke);
-            
-            if (props.magnifierEnabled && d < props.magnifierRadius) {
-              let factor = p.map(d, 0, props.magnifierRadius, 2, 1); // 2x size at center
-              strokeSize *= factor;
+          const pixX = x < 0 ? 0 : x >= imgW ? imgW - 1 : x | 0;
+          const pixY = y < 0 ? 0 : y >= imgH ? imgH - 1 : y | 0;
+          const brightness = imgPixels[(pixX + pixY * imgW) * 4];
+
+          const visible = invert ? brightness < thr : brightness > thr;
+          if (!visible) continue;
+
+          let shadeIdx = ((brightness / 255) * (palLen - 1)) | 0;
+          if (shadeIdx < 0) shadeIdx = 0;
+          if (shadeIdx >= palLen) shadeIdx = palLen - 1;
+
+          let strokeSz = minSt + (brightness / 255) * (maxSt - minSt);
+
+          if (mEnabled) {
+            const ddx = x - curX;
+            const ddy = y - curY;
+            const d   = Math.sqrt(ddx * ddx + ddy * ddy);
+            if (d < mRad) {
+              strokeSz *= 1 + (1 - d / mRad); // up to 2× at center
             }
-            
-            if (palette[shadeIndex]) {
-              p.stroke(palette[shadeIndex]);
-              p.strokeWeight(strokeSize);
-              p.point(x, y);
-            }
+          }
+
+          if (palette[shadeIdx]) {
+            p.stroke(palette[shadeIdx]);
+            p.strokeWeight(strokeSz);
+            p.point(x, y);
           }
         }
       };
@@ -482,8 +597,8 @@ export function ForceFieldBackground({
   }, [imageUrl]);
 
   return (
-    <div 
-      className={`relative w-full h-full overflow-hidden bg-black ${className}`} 
+    <div
+      className={`relative w-full h-full overflow-hidden bg-black ${className}`}
       ref={containerRef}
     >
       {isLoading && (

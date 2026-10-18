@@ -224,10 +224,11 @@ function HeroSection() {
           spacing={11}
           minStroke={1.5}
           maxStroke={5}
-          forceStrength={15}
-          magnifierRadius={180}
-          friction={0.91}
-          restoreSpeed={0.045}
+          forceStrength={18}
+          magnifierRadius={200}
+          friction={0.84}
+          restoreSpeed={0.12}
+          magnifierInertia={0.80}
         />
       </div>
 
