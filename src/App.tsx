@@ -380,7 +380,7 @@ const HeroSection = React.memo(function HeroSection({
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00ff87] shadow-[0_0_8px_#00ff87]" />
           </span>
           <span className="text-sm font-semibold text-emerald-200 tracking-wide font-space">
-            Open to full-time opportunities · Ho Chi Minh City
+            Open to full-time opportunities · Ho Chi Minh City, Vietnam
           </span>
           <ChevronRight className="w-3.5 h-3.5 text-[#00ff87]" />
         </div>
@@ -402,10 +402,10 @@ const HeroSection = React.memo(function HeroSection({
           className="text-xl sm:text-2xl text-zinc-200 max-w-3xl mx-auto mb-10 leading-relaxed font-normal animate-fade-up"
           style={{ animationDelay: '0.3s' }}
         >
-          Software Engineering graduate building robust, scalable digital products —
-          from <span className="text-white font-semibold underline decoration-[#00ff87]/50 decoration-[#00ff87]/50 underline-offset-4">.NET backends</span> &amp;{' '}
-          <span className="text-white font-semibold underline decoration-[#00ff87]/50 decoration-[#00ff87]/50 underline-offset-4">Next.js interfaces</span> to{' '}
-          <span className="text-white font-semibold underline decoration-[#00ff87]/50 decoration-[#00ff87]/50 underline-offset-4">AI-integrated systems</span>.
+          Software Engineering candidate building robust, scalable digital products —
+          from <span className="text-white font-semibold underline decoration-[#00ff87]/50 underline-offset-4">.NET backends</span> &amp;{' '}
+          <span className="text-white font-semibold underline decoration-[#00ff87]/50 underline-offset-4">Next.js interfaces</span> to{' '}
+          <span className="text-white font-semibold underline decoration-[#00ff87]/50 underline-offset-4">AI-integrated systems</span>.
         </p>
 
         {/* CTAs */}
@@ -439,17 +439,17 @@ const HeroSection = React.memo(function HeroSection({
           className="mt-14 flex flex-wrap items-center justify-center gap-8 text-base text-zinc-300 font-medium animate-fade-up"
           style={{ animationDelay: '0.55s' }}
         >
-          <a href="mailto:ngoanhtuan23.it@gmail.com" className="flex items-center gap-2 hover:text-[#00ff87] hover:text-[#00ff87] transition-colors">
+          <a href="mailto:ngoanhtuan23.it@gmail.com" className="flex items-center gap-2 hover:text-[#00ff87] transition-colors">
             <Mail className="w-4 h-4 text-[#00ff87]" />
             ngoanhtuan23.it@gmail.com
           </a>
-          <a href="https://github.com/Tuandaca" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#00ff87] hover:text-[#00ff87] transition-colors">
+          <a href="https://github.com/Tuandaca" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#00ff87] transition-colors">
             <Github className="w-4 h-4 text-[#00ff87]" />
             github.com/Tuandaca
           </a>
           <span className="flex items-center gap-2">
             <MapPin className="w-4 h-4 text-[#00ff87]" />
-            Tan Hung, District 7, HCM City
+            Ho Chi Minh City, Vietnam
           </span>
         </div>
       </div>
@@ -457,7 +457,7 @@ const HeroSection = React.memo(function HeroSection({
       {/* Scroll hint */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[2] flex flex-col items-center gap-2 text-zinc-400 text-xs animate-fade-in pointer-events-none select-none" style={{ animationDelay: '1s' }}>
         <span className="font-mono tracking-widest uppercase text-[#00ff87]/80">scroll</span>
-        <div className="w-px h-10 bg-gradient-to-b from-[#00ff87]/80 from-[#00ff87]/80 to-transparent" />
+        <div className="w-px h-10 bg-gradient-to-b from-[#00ff87]/80 to-transparent" />
       </div>
     </section>
   );
@@ -483,10 +483,10 @@ const AboutSection = React.memo(function AboutSection() {
             </ScrollReveal>
             <ScrollReveal delay={160}>
               <p className="text-zinc-200 text-lg leading-relaxed mb-6 font-normal">
-                I'm a Software Engineering student at{' '}
-                <span className="text-white font-semibold">Ton Duc Thang University</span> (graduating 2026) with hands-on
-                experience in full-stack web development and AI-integrated systems — both through academic research and
-                real-world internship work.
+                I am a Software Engineering candidate at{' '}
+                <span className="text-white font-semibold">Ton Duc Thang University</span> (Class of 2026) with practical
+                experience in full-stack web development and AI-integrated systems through university infrastructure work
+                and academic capstone research.
               </p>
             </ScrollReveal>
             <ScrollReveal delay={220}>
@@ -502,7 +502,7 @@ const AboutSection = React.memo(function AboutSection() {
             <div className="grid grid-cols-3 gap-5">
               {[
                 { val: '2+', label: 'Years Coding' },
-                { val: '5+', label: 'Tech Stacks' },
+                { val: 'Core', label: 'Full-Stack Stack' },
                 { val: 'B2', label: 'English (Aptis)' },
               ].map((s, i) => (
                 <ScrollReveal key={s.label} delay={300 + i * 80}>
@@ -540,6 +540,9 @@ const AboutSection = React.memo(function AboutSection() {
 
                   <p className="font-space font-bold text-white text-2xl tracking-tight">Ngo Anh Tuan</p>
                   <p className="text-zinc-300 text-base mt-1 font-medium">Full-Stack Engineer</p>
+                  <p className="text-xs text-zinc-400 mt-2 flex items-center gap-1 font-mono">
+                    <MapPin className="w-3.5 h-3.5 text-[#00ff87]" /> Ho Chi Minh City, Vietnam
+                  </p>
 
                   {/* 6 Glass Social & Contact Buttons (Responsive 3x2 Grid) */}
                   <div className="grid grid-cols-3 gap-3 sm:gap-3.5 mt-6 w-full max-w-[240px] place-items-center">
@@ -815,7 +818,7 @@ const ProjectsSection = React.memo(function ProjectsSection() {
                     target="_blank"
                     rel="noopener noreferrer"
                     id={`proj-github-${i}`}
-                    className="flex items-center gap-2 text-sm sm:text-base text-zinc-300 hover:text-[#00ff87] hover:text-[#00ff87] transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00ff87] rounded-lg px-2 py-1 -ml-2"
+                    className="flex items-center gap-2 text-sm sm:text-base text-zinc-300 hover:text-[#00ff87] transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00ff87] rounded-lg px-2 py-1 -ml-2"
                   >
                     <Github className="w-5 h-5" />
                     View Source
@@ -856,24 +859,81 @@ const ProjectsSection = React.memo(function ProjectsSection() {
   );
 });
 
-const TestimonialBanner = React.memo(function TestimonialBanner() {
+const EngineeringFocusBanner = React.memo(function EngineeringFocusBanner() {
+  const pillars = [
+    {
+      title: 'Robust Backend Systems',
+      tech: '.NET / ASP.NET Core · Node.js / NestJS · RESTful APIs',
+      description: 'Scalable service architectures, modular domain logic, and high-performance RESTful APIs.',
+      icon: <Server className="w-5 h-5 text-cyan-400" />,
+      accent: 'border-cyan-500/30 bg-cyan-500/5',
+      badgeColor: 'text-cyan-400',
+    },
+    {
+      title: 'Real-Time & Event Architecture',
+      tech: 'Redis · Socket.IO · PostgreSQL Concurrency',
+      description: 'Low-latency state synchronization, pub/sub messaging pipelines, and reliable transaction isolation.',
+      icon: <Layers className="w-5 h-5 text-emerald-400" />,
+      accent: 'border-emerald-500/30 bg-emerald-500/5',
+      badgeColor: 'text-emerald-400',
+    },
+    {
+      title: 'Grounded AI & Knowledge Graphs',
+      tech: 'GraphRAG · Neo4j · Vector Retrieval · FastAPI',
+      description: 'Hallucination-resistant retrieval augmenting LLMs with entity-relation graphs and vector search.',
+      icon: <Brain className="w-5 h-5 text-[#00ff87]" />,
+      accent: 'border-[#00ff87]/30 bg-[#00ff87]/5',
+      badgeColor: 'text-[#00ff87]',
+    },
+    {
+      title: 'Type-Safe Frontend',
+      tech: 'Next.js · React · TypeScript · Tailwind CSS',
+      description: 'Production-grade component architectures with strict static typing and accessible design systems.',
+      icon: <Globe className="w-5 h-5 text-teal-300" />,
+      accent: 'border-teal-500/30 bg-teal-500/5',
+      badgeColor: 'text-teal-300',
+    },
+  ];
+
   return (
-    <div className="w-full relative z-10 bg-gradient-to-r from-emerald-950/80 via-black to-emerald-950/80 border-y border-[#00ff87]/30 py-20 px-6 shadow-[0_0_50px_rgba(0,255,135,0.08)]">
-      <ScrollReveal delay={100}>
-        <div className="max-w-4xl mx-auto text-center content-shield">
-          <div className="flex justify-center gap-1.5 text-[#00ff87] mb-6">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} className="w-6 h-6 fill-[#00ff87] text-[#00ff87]" />
-            ))}
+    <div className="w-full relative z-10 bg-gradient-to-r from-emerald-950/40 via-black to-emerald-950/40 border-y border-[#00ff87]/20 py-20 px-6 shadow-[0_0_50px_rgba(0,255,135,0.06)]">
+      <div className="max-w-6xl mx-auto content-shield">
+        <ScrollReveal delay={0}>
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-[#00ff87]/30 text-[#00ff87] text-xs font-mono font-semibold uppercase tracking-wider mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00ff87] animate-pulse" />
+              CORE ARCHITECTURE &amp; SYSTEMS FOCUS
+            </div>
+            <h2 className="font-space text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight">
+              Engineering <span className="text-[#00ff87] green-glow">Capabilities</span>
+            </h2>
+            <p className="text-zinc-300 text-base sm:text-lg mt-3 max-w-2xl mx-auto">
+              Production-focused technical capabilities grounded in verified project implementations and academic research.
+            </p>
           </div>
-          <blockquote className="font-space text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-snug">
-            "Solid technical foundation, fast learner, and brings genuine enthusiasm to every project. A great addition to any engineering team."
-          </blockquote>
-          <p className="mt-7 text-[#00ff87] text-base sm:text-lg font-semibold font-space tracking-wide">
-            — Internship Supervisor, Van Lang University IT Department
-          </p>
+        </ScrollReveal>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {pillars.map((pillar, i) => (
+            <ScrollReveal key={pillar.title} delay={100 + i * 80} className="h-full">
+              <div className="bento-card p-6 flex flex-col h-full hover:border-[#00ff87]/40 transition-colors">
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center border mb-4 ${pillar.accent}`}>
+                  {pillar.icon}
+                </div>
+                <h3 className="font-space font-bold text-lg text-white mb-1.5 leading-snug">
+                  {pillar.title}
+                </h3>
+                <p className={`text-xs font-mono font-semibold mb-3 ${pillar.badgeColor}`}>
+                  {pillar.tech}
+                </p>
+                <p className="text-sm text-zinc-300 leading-relaxed flex-1">
+                  {pillar.description}
+                </p>
+              </div>
+            </ScrollReveal>
+          ))}
         </div>
-      </ScrollReveal>
+      </div>
     </div>
   );
 });
@@ -897,14 +957,14 @@ const Footer = React.memo(function Footer() {
             target="_blank"
             rel="noreferrer"
             id="footer-github-link"
-            className="hover:text-[#00ff87] hover:text-[#00ff87] transition-colors font-medium"
+            className="hover:text-[#00ff87] transition-colors font-medium"
           >
             GitHub
           </a>
           <a
             href="mailto:ngoanhtuan23.it@gmail.com"
             id="footer-email-link"
-            className="hover:text-[#00ff87] hover:text-[#00ff87] transition-colors font-medium"
+            className="hover:text-[#00ff87] transition-colors font-medium"
           >
             Email
           </a>
@@ -1008,7 +1068,7 @@ export default function App() {
         <SkillsSection />
         <ExperienceSection />
         <ProjectsSection />
-        <TestimonialBanner />
+        <EngineeringFocusBanner />
         <ContactSection id="contact" />
       </main>
 

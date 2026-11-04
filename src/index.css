@@ -132,7 +132,6 @@ html.dark {
 
 /* ===== TYPOGRAPHY ===== */
 .font-space { font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif; }
-.font-manrope { font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif; }
 .font-mono { font-family: 'JetBrains Mono', monospace; }
 
 /* ===== ANIMATIONS ===== */
@@ -488,10 +487,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 /* ===== NEON GREEN GLOW ===== */
 .green-glow {
-  text-shadow: 0 0 25px rgba(0, 255, 135, 0.65), 0 0 55px rgba(0, 255, 135, 0.3);
-}
-.red-glow {
-  /* Backward-compatible alias */
   text-shadow: 0 0 25px rgba(0, 255, 135, 0.65), 0 0 55px rgba(0, 255, 135, 0.3);
 }
 
