@@ -88,7 +88,12 @@ interface ProjectItem {
   featured: boolean;
   icon: React.ReactNode;
   accent: string;
-  border: string;
+  accentLine: string;
+  problem?: string;
+  challenge?: string;
+  contribution?: string;
+  architecture?: string[];
+  engineeringFocus?: string[];
 }
 
 const PROJECTS: ProjectItem[] = [
@@ -96,50 +101,66 @@ const PROJECTS: ProjectItem[] = [
     title: 'AI Coding Starter',
     badge: 'AI Developer Tooling',
     description:
-      'Interactive Project Creator & CLI automation suite with 21+ tech stack presets, contextual prompt systems, and cross-platform setup workflows.',
-    tech: ['Node.js', 'TypeScript', 'CLI', 'AI Tooling', 'Automation'],
+      'Python project wizard with 21+ tech stack presets, a generated context file, and setup scripts for starting AI-assisted development.',
+    tech: ['Python', 'CLI', 'Project scaffolding', 'Setup scripts'],
     github: 'https://github.com/Tuandaca/AI-Coding-starter',
-    featured: true,
+    featured: false,
     icon: <Terminal className="w-6 h-6" />,
-    accent: 'text-cyan-400',
-    border: 'rgba(6,182,212,0.4)',
+    accent: 'text-zinc-200',
+    accentLine: 'bg-zinc-500',
   },
   {
     title: 'Travel AI — GraphRAG & Knowledge Graph Q&A',
     badge: 'Academic Capstone',
     description:
-      'Intelligent Q&A system for Ho Chi Minh City tourism leveraging Retrieval-Augmented Generation with Knowledge Graphs for context-rich, grounded query resolution.',
-    tech: ['Python', 'FastAPI', 'RAG', 'Neo4j', 'LLM'],
+      'Tourism Q&A for Ho Chi Minh City using sentence embeddings and keyword search over Neo4j place nodes.',
+    tech: ['Python', 'FastAPI', 'Neo4j', 'sentence-transformers', 'Cypher', 'Gemini'],
     github: 'https://github.com/Tuandaca/DACNTT',
     featured: true,
     icon: <Brain className="w-6 h-6" />,
-    accent: 'text-[#00ff87]',
-    border: 'rgba(0,255,135,0.4)',
+    accent: 'text-cyan-400',
+    accentLine: 'bg-cyan-400',
+    problem: 'A visitor may describe a destination in free text or remember only part of its name; the system needs to find relevant place records.',
+    challenge: 'Combine Neo4j vector index matches with Cypher keyword node search, optionally filter by province, and pass retrieved node content to Gemini.',
+    contribution: 'FastAPI retrieval flow combining Neo4j vector and keyword searches.',
+    architecture: ['FastAPI request', 'Sentence embedding', 'Neo4j vector index + keyword node search', 'Gemini response'],
+    engineeringFocus: [
+      'FastAPI combines vector and keyword retrieval over Neo4j place nodes.',
+      'Gemini uses retrieved node content when available, or general knowledge when retrieval yields none.',
+    ],
   },
   {
     title: 'Cinema — Movie Booking & AI Recommendation',
     badge: 'Full-Stack Platform',
     description:
-      'End-to-end cinema management platform with real-time seat reservation, order tracking, and online checkout — powered by AI/LLM recommendations.',
+      'Movie booking platform with seat holds, live seat updates, order creation, checkout integration, and a Gemini-powered catalog assistant.',
     tech: ['Next.js', 'TypeScript', 'NestJS', 'PostgreSQL', 'Prisma', 'Redis', 'Socket.IO'],
     github: 'https://github.com/Tuandaca/cinema',
     featured: true,
     icon: <Layers className="w-6 h-6" />,
     accent: 'text-emerald-400',
-    border: 'rgba(52,211,153,0.35)',
+    accentLine: 'bg-[#00ff87]',
+    problem: 'Customers need current seat availability while booking and order state changes are handled by the API.',
+    challenge: 'Coordinate temporary Redis-backed seat holds with Socket.IO seat broadcasts as booking requests arrive.',
+    contribution: 'Full-stack booking and live seat update implementation.',
+    architecture: ['Next.js client', 'NestJS booking API', 'Redis holds + Socket.IO updates', 'PostgreSQL orders'],
+    engineeringFocus: [
+      'Redis Lua code manages seat holds; Socket.IO broadcasts seat changes.',
+      'NestJS creates bookings and orders, Stripe payment intents support checkout, and Gemini handles catalog questions.',
+    ],
   },
   {
     title: 'Gaming Mouse — Premium Product Landing Page',
     badge: 'Frontend / Product Experience',
     description:
-      'High-performance gaming mouse product landing showcase with interactive specs, responsive 3D-inspired visuals, and ergonomic feature breakdown.',
+      'Responsive gaming mouse product landing showcase with hover-driven cards and an ergonomic feature breakdown.',
     tech: ['React 18', 'TypeScript', 'Vite', 'Tailwind CSS', 'shadcn/ui', 'Radix UI', 'React Router'],
     github: 'https://github.com/Tuandaca/gamingmouse',
     liveUrl: 'https://gamingmouse.lovable.app/',
-    featured: true,
+    featured: false,
     icon: <Globe className="w-6 h-6" />,
     accent: 'text-violet-400',
-    border: 'rgba(168,85,247,0.35)',
+    accentLine: 'bg-violet-400',
   },
 ];
 
@@ -768,6 +789,13 @@ const ExperienceSection = React.memo(function ExperienceSection() {
 });
 
 const ProjectsSection = React.memo(function ProjectsSection() {
+  // Keep the source data in its verified order while giving the two deeper
+  // engineering case studies the first row of the portfolio.
+  const displayProjects = [
+    ...PROJECTS.filter((project) => project.featured),
+    ...PROJECTS.filter((project) => !project.featured),
+  ];
+
   return (
     <section id="projects" className="relative z-10 py-28 px-6 border-t border-white/10 bg-gradient-to-b from-black via-zinc-950/40 to-black scroll-mt-24 sm:scroll-mt-28">
       <div className="max-w-6xl mx-auto">
@@ -781,44 +809,82 @@ const ProjectsSection = React.memo(function ProjectsSection() {
             </h2>
           </ScrollReveal>
           <ScrollReveal delay={160}>
-            <p className="text-zinc-200 text-lg md:text-xl mt-4 max-w-xl mx-auto leading-relaxed">
-              Projects ranging from AI-powered research systems to full-stack SaaS platforms.
+            <p className="text-zinc-200 text-lg md:text-xl mt-4 max-w-2xl mx-auto leading-relaxed">
+              Two engineering case studies, followed by developer tooling and frontend work.
             </p>
           </ScrollReveal>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {PROJECTS.map((proj, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+          {displayProjects.map((proj, i) => (
             <ScrollReveal key={i} delay={220 + i * 120} className="h-full">
-              <div
-                className="bento-card p-8 flex flex-col h-full"
-                style={{ borderColor: proj.featured ? proj.border : undefined }}
+              <article
+                data-project-tier={proj.featured ? 'flagship' : 'secondary'}
+                aria-labelledby={`project-title-${i}`}
+                className={`bento-card flex flex-col h-full ${proj.featured ? 'p-5 sm:p-8' : 'p-6'}`}
               >
-                <div className="flex items-start justify-between mb-5 gap-3">
-                  <div className={`p-3.5 rounded-xl bg-white/5 border border-white/10 ${proj.accent}`}>
+                <div className={`h-0.5 w-14 rounded-full mb-4 ${proj.accentLine}`} aria-hidden="true" />
+                <div className="flex items-start justify-between mb-3 gap-3">
+                  <div className={`p-3 rounded-xl bg-white/5 border border-white/10 ${proj.accent}`}>
                     {proj.icon}
                   </div>
-                  <span className="text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-[#00ff87]/30 bg-[#00ff87]/10 text-[#00ff87]">
+                  <span className={`text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.04] ${proj.featured ? proj.accent : 'text-zinc-300'}`}>
                     {proj.badge}
                   </span>
                 </div>
 
-                <h3 className="font-space font-bold text-white text-2xl mb-3 leading-snug">{proj.title}</h3>
-                <p className="text-zinc-200 text-base leading-relaxed flex-1 mb-6">{proj.description}</p>
+                <h3 id={`project-title-${i}`} className={`font-space font-bold text-white leading-snug mb-2 ${proj.featured ? 'text-2xl sm:text-[1.7rem]' : 'text-xl'}`}>{proj.title}</h3>
+                <p className={`text-zinc-200 leading-relaxed ${proj.featured ? 'text-base mb-4' : 'text-sm sm:text-base mb-5'}`}>{proj.description}</p>
 
-                <div className="flex flex-wrap gap-2.5 mb-6">
+                {proj.featured && proj.problem && proj.challenge && proj.architecture && proj.engineeringFocus && (
+                  <div className="space-y-4 mb-5">
+                    <div className="border-l-2 border-white/15 pl-4">
+                      <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-400 mb-1.5">Problem</p>
+                      <p className="text-sm leading-relaxed text-zinc-200">{proj.problem}</p>
+                    </div>
+                    {proj.contribution && (
+                      <div className="border-l-2 border-white/15 pl-4">
+                        <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-400 mb-1.5">Contribution</p>
+                        <p className="text-sm leading-relaxed text-zinc-200">{proj.contribution}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-400 mb-2.5">Architecture</p>
+                      <ol className="grid grid-cols-2 gap-2 font-mono text-[11px] leading-relaxed" aria-label={`${proj.title} architecture flow`}>
+                        {proj.architecture.map((step, stepIndex) => (
+                          <li key={step} className="min-w-0 rounded-md border border-white/10 bg-black/25 px-2.5 py-1.5 text-zinc-200">
+                            <span className="text-zinc-500 mr-2" aria-hidden="true">{String(stepIndex + 1).padStart(2, '0')}</span>
+                            {step}
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-black/25 p-4">
+                      <p className={`font-mono text-[11px] uppercase tracking-widest mb-1.5 ${proj.accent}`}>Technical challenge</p>
+                      <p className="text-sm leading-relaxed text-zinc-200">{proj.challenge}</p>
+                    </div>
+                    <div>
+                      <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-400 mb-2">Engineering focus</p>
+                      <ul className="space-y-1.5 text-sm leading-relaxed text-zinc-300 list-disc pl-4 marker:text-zinc-500">
+                        {proj.engineeringFocus.map((item) => <li key={item}>{item}</li>)}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-2 mb-4 mt-auto" aria-label={`${proj.title} technologies`}>
                   {proj.tech.map((t) => (
                     <span key={t} className="skill-pill text-xs">{t}</span>
                   ))}
                 </div>
 
-                <div className="flex items-center justify-between pt-6 border-t border-white/10">
+                <div className="flex items-center justify-between pt-4 border-t border-white/10">
                   <a
                     href={proj.github}
                     target="_blank"
                     rel="noopener noreferrer"
                     id={`proj-github-${i}`}
-                    className="flex items-center gap-2 text-sm sm:text-base text-zinc-300 hover:text-[#00ff87] transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00ff87] rounded-lg px-2 py-1 -ml-2"
+                    className="flex items-center gap-2 min-h-[44px] text-sm sm:text-base text-zinc-300 hover:text-[#00ff87] transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00ff87] rounded-lg px-2 py-2.5 -ml-2"
                   >
                     <Github className="w-5 h-5" />
                     View Source
@@ -829,13 +895,13 @@ const ProjectsSection = React.memo(function ProjectsSection() {
                       target="_blank"
                       rel="noopener noreferrer"
                       id={`proj-ext-${i}`}
-                      className={`flex items-center gap-1.5 text-sm sm:text-base font-semibold ${proj.accent} hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00ff87] rounded-lg px-2 py-1 -mr-2`}
+                      className={`flex items-center gap-1.5 min-h-[44px] text-sm sm:text-base font-semibold ${proj.accent} hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00ff87] rounded-lg px-2 py-2.5 -mr-2`}
                     >
                       Live Demo <ExternalLink className="w-4 h-4" />
                     </a>
                   ) : null}
                 </div>
-              </div>
+              </article>
             </ScrollReveal>
           ))}
         </div>
@@ -864,31 +930,31 @@ const EngineeringFocusBanner = React.memo(function EngineeringFocusBanner() {
     {
       title: 'Robust Backend Systems',
       tech: '.NET / ASP.NET Core · Node.js / NestJS · RESTful APIs',
-      description: 'Scalable service architectures, modular domain logic, and high-performance RESTful APIs.',
+      description: 'ASP.NET Core and NestJS APIs with REST endpoints and database-backed workflows.',
       icon: <Server className="w-5 h-5 text-cyan-400" />,
       accent: 'border-cyan-500/30 bg-cyan-500/5',
       badgeColor: 'text-cyan-400',
     },
     {
-      title: 'Real-Time & Event Architecture',
-      tech: 'Redis · Socket.IO · PostgreSQL Concurrency',
-      description: 'Low-latency state synchronization, pub/sub messaging pipelines, and reliable transaction isolation.',
+      title: 'Real-Time Booking Updates',
+      tech: 'Redis · Socket.IO · PostgreSQL',
+      description: 'Redis-backed seat holds and Socket.IO seat updates accompany NestJS booking and order flows.',
       icon: <Layers className="w-5 h-5 text-emerald-400" />,
       accent: 'border-emerald-500/30 bg-emerald-500/5',
       badgeColor: 'text-emerald-400',
     },
     {
-      title: 'Grounded AI & Knowledge Graphs',
-      tech: 'GraphRAG · Neo4j · Vector Retrieval · FastAPI',
-      description: 'Hallucination-resistant retrieval augmenting LLMs with entity-relation graphs and vector search.',
-      icon: <Brain className="w-5 h-5 text-[#00ff87]" />,
-      accent: 'border-[#00ff87]/30 bg-[#00ff87]/5',
-      badgeColor: 'text-[#00ff87]',
+      title: 'AI-Assisted Travel Search',
+      tech: 'FastAPI · Neo4j · sentence-transformers · Cypher',
+      description: 'Neo4j vector index and Cypher keyword search retrieve place node content for Gemini responses.',
+      icon: <Brain className="w-5 h-5 text-cyan-400" />,
+      accent: 'border-cyan-500/30 bg-cyan-500/5',
+      badgeColor: 'text-cyan-400',
     },
     {
       title: 'Type-Safe Frontend',
       tech: 'Next.js · React · TypeScript · Tailwind CSS',
-      description: 'Production-grade component architectures with strict static typing and accessible design systems.',
+      description: 'TypeScript interfaces with Next.js and React, styled with Tailwind CSS.',
       icon: <Globe className="w-5 h-5 text-teal-300" />,
       accent: 'border-teal-500/30 bg-teal-500/5',
       badgeColor: 'text-teal-300',
@@ -908,7 +974,7 @@ const EngineeringFocusBanner = React.memo(function EngineeringFocusBanner() {
               Engineering <span className="text-[#00ff87] green-glow">Capabilities</span>
             </h2>
             <p className="text-zinc-300 text-base sm:text-lg mt-3 max-w-2xl mx-auto">
-              Production-focused technical capabilities grounded in verified project implementations and academic research.
+              Technical approaches visible across project repositories and internship work.
             </p>
           </div>
         </ScrollReveal>
