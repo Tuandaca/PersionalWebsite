@@ -505,14 +505,14 @@ const AboutSection = React.memo(function AboutSection() {
             {/* Quick stats */}
             <div className="grid grid-cols-3 gap-2 sm:gap-5">
               {[
-                { val: '.NET', label: 'Backend APIs' },
-                { val: 'Core', label: 'Full-Stack Stack' },
-                { val: 'B2', label: 'English (Aptis)' },
+                { val: 'Backend', label: '.NET · Node.js · FastAPI' },
+                { val: 'Full-Stack', label: 'React · Next.js · Vue.js' },
+                { val: 'Database', label: 'SQL Server · PostgreSQL · Neo4j' },
               ].map((s, i) => (
                 <ScrollReveal key={s.label} delay={300 + i * 80}>
                   <div className="text-center px-1 py-4 sm:p-5 min-w-0 border border-[#00ff87]/20 rounded-2xl bg-black/40 shadow-[0_0_20px_rgba(0,255,135,0.06)]">
-                    <div className="text-2xl sm:text-3xl md:text-4xl font-black font-space text-[#00ff87]">{s.val}</div>
-                    <div className="text-xs sm:text-sm text-zinc-300 mt-1 font-medium leading-snug break-words">{s.label}</div>
+                    <div className="text-[clamp(1.05rem,1.75vw,1.25rem)] font-black font-space text-[#00ff87]">{s.val}</div>
+                    <div className="text-xs text-zinc-300 mt-1 font-medium leading-snug break-words">{s.label}</div>
                   </div>
                 </ScrollReveal>
               ))}
