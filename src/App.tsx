@@ -49,25 +49,25 @@ const SKILLS: { category: string; icon: React.ReactNode; color: string; items: s
   {
     category: 'Backend',
     icon: <Server className="w-5 h-5" />,
-    color: 'text-cyan-400',
+    color: 'text-emerald-400',
     items: ['.NET / ASP.NET Core', 'Node.js', 'NestJS', 'FastAPI', 'RESTful API'],
   },
   {
     category: 'Frontend',
     icon: <Globe className="w-5 h-5" />,
-    color: 'text-emerald-400',
+    color: 'text-violet-400',
     items: ['Next.js', 'React', 'Vue.js', 'Tailwind CSS'],
   },
   {
     category: 'Database',
     icon: <Database className="w-5 h-5" />,
-    color: 'text-teal-300',
+    color: 'text-cyan-400',
     items: ['SQL Server', 'PostgreSQL', 'Prisma', 'Neo4j'],
   },
   {
     category: 'AI & ML',
     icon: <Brain className="w-5 h-5" />,
-    color: 'text-[#00ff87]',
+    color: 'text-cyan-400',
     items: ['RAG', 'LLM Integration', 'Knowledge Graphs', 'Vector Search'],
   },
   {
@@ -713,7 +713,7 @@ const ExperienceSection = React.memo(function ExperienceSection() {
                 <span className="text-sm font-mono text-[#00ff87] shrink-0 pt-1 font-semibold">2021 – 2026</span>
               </div>
               <div className="flex flex-wrap gap-2 mt-4">
-                <span className="skill-pill"><Award className="w-3.5 h-3.5 text-[#00ff87]" /> Aptis ESOL B2 (2024)</span>
+                <span className="skill-pill text-amber-300 bg-amber-400/10 border-amber-400/30"><Award className="w-3.5 h-3.5 text-amber-400" /> Aptis ESOL B2 (2024)</span>
               </div>
             </div>
           </div>

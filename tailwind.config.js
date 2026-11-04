@@ -16,6 +16,14 @@ export default {
           green: '#00ff87',
           neon: '#39ff14',
           emerald: '#10b981',
+          cyan: '#22d3ee',
+          violet: '#a78bfa',
+          amber: '#fbbf24',
+        },
+        cyber: {
+          bg: '#010503',
+          card: 'rgba(10, 20, 14, 0.92)',
+          border: 'rgba(255, 255, 255, 0.08)',
         },
       },
       keyframes: {
