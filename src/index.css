@@ -49,10 +49,15 @@ html.dark {
   --accent-green-dark: #00b862;
   --accent-green-glow: rgba(0, 255, 135, 0.45);
   --accent-green-subtle: rgba(0, 255, 135, 0.08);
+  --accent-cyan: #22d3ee;
+  --accent-violet: #a78bfa;
+  --accent-amber: #fbbf24;
 
   /* Surfaces & Bento Cards */
   --card-bg: linear-gradient(135deg, rgba(10, 20, 14, 0.92), rgba(2, 8, 4, 0.96));
-  --card-border: rgba(0, 255, 135, 0.12);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-border-glow: rgba(0, 255, 135, 0.12);
+  --card-border-subtle: rgba(0, 255, 135, 0.12);
   --card-hover-border: rgba(0, 255, 135, 0.45);
   --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
   --card-hover-shadow: 0 14px 40px -10px rgba(0, 255, 135, 0.2);
@@ -73,11 +78,11 @@ html.dark {
   --gradient-blur-bg: linear-gradient(to bottom, rgba(2, 6, 3, 0.85), transparent);
 
   /* Interactive Elements */
-  --skill-pill-bg: rgba(0, 255, 135, 0.06);
-  --skill-pill-border: rgba(0, 255, 135, 0.22);
+  --skill-pill-bg: rgba(255, 255, 255, 0.03);
+  --skill-pill-border: rgba(255, 255, 255, 0.08);
   --skill-pill-text: #e2e8f0;
-  --skill-pill-hover-bg: rgba(0, 255, 135, 0.18);
-  --skill-pill-hover-border: rgba(0, 255, 135, 0.65);
+  --skill-pill-hover-bg: rgba(0, 255, 135, 0.14);
+  --skill-pill-hover-border: rgba(0, 255, 135, 0.5);
   --skill-pill-hover-text: #ffffff;
 
   --input-bg: rgba(0, 0, 0, 0.60);
@@ -132,7 +137,6 @@ html.dark {
 
 /* ===== TYPOGRAPHY ===== */
 .font-space { font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif; }
-.font-manrope { font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif; }
 .font-mono { font-family: 'JetBrains Mono', monospace; }
 
 /* ===== ANIMATIONS ===== */
@@ -303,6 +307,9 @@ html.dark {
   transform: translateY(-1px);
   box-shadow: 0 0 30px rgba(0, 255, 135, 0.35);
 }
+.shiny-cta:focus-visible {
+  box-shadow: 0 0 0 2px #020704, 0 0 0 4px #00ff87, 0 0 30px rgba(0, 255, 135, 0.35);
+}
 
 .shiny-cta::before {
   content: '';
@@ -428,25 +435,27 @@ html.dark {
 }
 
 /* ===== SKILL PILL ===== */
-.skill-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 13px;
-  border-radius: 9999px;
-  border: 1px solid var(--skill-pill-border, rgba(0, 255, 135, 0.22));
-  background: var(--skill-pill-bg, rgba(0, 255, 135, 0.06));
-  color: var(--skill-pill-text, #e2e8f0);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: all 0.2s ease;
-}
-.skill-pill:hover {
-  background: var(--skill-pill-hover-bg, rgba(0, 255, 135, 0.18));
-  border-color: var(--skill-pill-hover-border, rgba(0, 255, 135, 0.65));
-  color: var(--skill-pill-hover-text, #ffffff);
-  box-shadow: 0 0 16px var(--accent-green-subtle, rgba(0, 255, 135, 0.22));
+@layer components {
+  .skill-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 13px;
+    border-radius: 9999px;
+    border: 1px solid var(--skill-pill-border, rgba(255, 255, 255, 0.08));
+    background: var(--skill-pill-bg, rgba(255, 255, 255, 0.03));
+    color: var(--skill-pill-text, #e2e8f0);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    transition: all 0.2s ease;
+  }
+  .skill-pill:hover {
+    background: var(--skill-pill-hover-bg, rgba(0, 255, 135, 0.14));
+    border-color: var(--skill-pill-hover-border, rgba(0, 255, 135, 0.5));
+    color: var(--skill-pill-hover-text, #ffffff);
+    box-shadow: 0 0 16px var(--accent-green-subtle, rgba(0, 255, 135, 0.22));
+  }
 }
 
 /* ===== TIMELINE ===== */
@@ -488,11 +497,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 /* ===== NEON GREEN GLOW ===== */
 .green-glow {
-  text-shadow: 0 0 25px rgba(0, 255, 135, 0.65), 0 0 55px rgba(0, 255, 135, 0.3);
-}
-.red-glow {
-  /* Backward-compatible alias */
-  text-shadow: 0 0 25px rgba(0, 255, 135, 0.65), 0 0 55px rgba(0, 255, 135, 0.3);
+  text-shadow: 0 0 16px rgba(0, 255, 135, 0.45);
 }
 
 /* ===== FORCE FIELD CANVAS OVERLAY ===== */
@@ -512,6 +517,11 @@ textarea:focus-visible,
 [tabindex]:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px #020704, 0 0 0 4px #00ff87;
+}
+
+/* Keep the decorative scroll hint clear of the Hero actions on short screens. */
+@media (max-height: 700px) {
+  .hero-scroll-hint { display: none; }
 }
 
 /* ===== PREFERS-REDUCED-MOTION OVERRIDES ===== */

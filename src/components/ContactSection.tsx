@@ -24,6 +24,14 @@ interface FormData {
   website: string; // Honeypot field for bot trapping
 }
 
+export function buildContactPayload(formData: FormData, formLoadedAt: number) {
+  return {
+    ...formData,
+    subject: formData.subject.trim() || 'Portfolio Inquiry',
+    formLoadedAt,
+  };
+}
+
 type SubmissionStatus = 'idle' | 'submitting' | 'success' | 'error';
 
 export const ContactSection: React.FC<ContactSectionProps> = React.memo(({
@@ -58,7 +66,7 @@ export const ContactSection: React.FC<ContactSectionProps> = React.memo(({
       errs.email = 'Please provide a valid email address';
     }
 
-    if (!formData.subject.trim() || formData.subject.trim().length < 3) {
+    if (formData.subject.trim() && formData.subject.trim().length < 3) {
       errs.subject = 'Subject must be at least 3 characters';
     } else if (formData.subject.trim().length > 120) {
       errs.subject = 'Subject cannot exceed 120 characters';
@@ -85,10 +93,7 @@ export const ContactSection: React.FC<ContactSectionProps> = React.memo(({
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          formLoadedAt,
-        }),
+        body: JSON.stringify(buildContactPayload(formData, formLoadedAt)),
       });
 
       const data = await response.json().catch(() => ({}));
@@ -129,17 +134,17 @@ export const ContactSection: React.FC<ContactSectionProps> = React.memo(({
           <ScrollReveal delay={0}>
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-[#00ff87]/30 text-[#00ff87] text-xs font-mono font-semibold uppercase tracking-wider mb-4">
               <span className="w-1.5 h-1.5 rounded-full bg-[#00ff87] animate-pulse" />
-              LET'S BUILD SOMETHING
+              OPEN TO OPPORTUNITIES
             </div>
           </ScrollReveal>
           <ScrollReveal delay={80}>
             <h2 className="font-space text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-4">
-              Have a project, opportunity, or idea?
+              Have an engineering opportunity, project, or collaboration?
             </h2>
           </ScrollReveal>
           <ScrollReveal delay={160}>
             <p className="text-zinc-300 text-lg md:text-xl leading-relaxed">
-              Send me a message and let's talk.
+              Send me a message and let's discuss. Open to software engineering opportunities and collaborations.
             </p>
           </ScrollReveal>
         </div>
@@ -160,7 +165,7 @@ export const ContactSection: React.FC<ContactSectionProps> = React.memo(({
                   Message Sent Successfully!
                 </h3>
                 <p className="text-zinc-300 max-w-md mx-auto text-base mb-8 leading-relaxed">
-                  Thank you for reaching out. Your message has been received and I'll get back to you within 24 hours.
+                  Thank you for reaching out. Your message has been received.
                 </p>
                 <button
                   type="button"
@@ -277,12 +282,11 @@ export const ContactSection: React.FC<ContactSectionProps> = React.memo(({
                       htmlFor="contact-subject"
                       className="block font-space text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-2"
                     >
-                      Subject / Purpose <span className="text-[#00ff87]">*</span>
+                      Subject / Purpose <span className="text-zinc-500 normal-case tracking-normal">(Optional)</span>
                     </label>
                     <input
                       id="contact-subject"
                       type="text"
-                      required
                       placeholder="e.g. Full-Stack Engineering Role"
                       value={formData.subject}
                       onChange={(e) => {

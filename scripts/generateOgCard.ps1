@@ -39,7 +39,7 @@ try {
   $roleFont = [System.Drawing.Font]::new('Arial', 43, [System.Drawing.FontStyle]::Bold, [System.Drawing.GraphicsUnit]::Pixel)
   $smallFont = [System.Drawing.Font]::new('Arial', 23, [System.Drawing.FontStyle]::Regular, [System.Drawing.GraphicsUnit]::Pixel)
   $graphics.DrawString('Ngo Anh Tuan', $nameFont, $white, 75, 180)
-  $graphics.DrawString('Full-Stack Engineer', $roleFont, $green, 78, 284)
+  $graphics.DrawString('Full-Stack Software Engineer', $roleFont, $green, 78, 284)
   $graphics.DrawString('Building robust digital products', $smallFont, $muted, 80, 374)
   $graphics.DrawString('tuandacadev.vercel.app', $smallFont, $green, 80, 540)
   $nameFont.Dispose(); $roleFont.Dispose(); $smallFont.Dispose()

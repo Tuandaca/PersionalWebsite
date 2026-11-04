@@ -307,26 +307,11 @@ export const ForceFieldBackground = forwardRef<ForceFieldBackgroundHandle, Force
     const p5InstanceRef = useRef<p5 | null>(null);
     const isLoopingRef = useRef<boolean>(isActive);
     const isResumePendingRef = useRef<boolean>(true);
+    const isReducedMotionRef = useRef<boolean>(
+      typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    );
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
-    // Imperative pause/resume handle
-    useImperativeHandle(ref, () => ({
-      pause: () => {
-        if (p5InstanceRef.current && isLoopingRef.current) {
-          p5InstanceRef.current.noLoop();
-          isLoopingRef.current = false;
-        }
-      },
-      resume: () => {
-        if (p5InstanceRef.current && !isLoopingRef.current) {
-          isResumePendingRef.current = true;
-          p5InstanceRef.current.loop();
-          isLoopingRef.current = true;
-        }
-      },
-      getP5: () => p5InstanceRef.current,
-    }));
 
     // Keep latest props in ref to access inside p5 closure without re-instantiating
     const propsRef = useRef({
@@ -335,6 +320,43 @@ export const ForceFieldBackground = forwardRef<ForceFieldBackgroundHandle, Force
       forceStrength, friction, restoreSpeed, magnifierInertia, isActive, opacity,
       qualityPreset
     });
+
+    const syncLoop = () => {
+      const p5Inst = p5InstanceRef.current;
+      if (!p5Inst) return;
+      const shouldLoop = propsRef.current.isActive && !isReducedMotionRef.current && !document.hidden;
+      if (shouldLoop && !isLoopingRef.current) {
+        isResumePendingRef.current = true;
+        p5Inst.loop();
+        isLoopingRef.current = true;
+      } else if (!shouldLoop && isLoopingRef.current) {
+        p5Inst.noLoop();
+        isLoopingRef.current = false;
+      }
+    };
+
+    // The coordinator may pause/resume this canvas independently of prop updates.
+    useImperativeHandle(ref, () => ({
+      pause: () => {
+        if (p5InstanceRef.current && isLoopingRef.current) {
+          p5InstanceRef.current.noLoop();
+          isLoopingRef.current = false;
+        }
+      },
+      resume: syncLoop,
+      getP5: () => p5InstanceRef.current,
+    }));
+
+    useEffect(() => {
+      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const onChange = () => {
+        isReducedMotionRef.current = mediaQuery.matches;
+        syncLoop();
+      };
+      onChange();
+      mediaQuery.addEventListener('change', onChange);
+      return () => mediaQuery.removeEventListener('change', onChange);
+    }, []);
 
     useEffect(() => {
       propsRef.current = {
@@ -350,23 +372,9 @@ export const ForceFieldBackground = forwardRef<ForceFieldBackgroundHandle, Force
       qualityPreset
     ]);
 
-    // Synchronize external isActive prop with p5 draw loop (pause/resume)
+    // Synchronize external activity with motion preference and tab visibility.
     useEffect(() => {
-      const p5Inst = p5InstanceRef.current;
-      if (!p5Inst) return;
-
-      if (isActive) {
-        if (!isLoopingRef.current) {
-          isResumePendingRef.current = true;
-          p5Inst.loop();
-          isLoopingRef.current = true;
-        }
-      } else {
-        if (isLoopingRef.current) {
-          p5Inst.noLoop();
-          isLoopingRef.current = false;
-        }
-      }
+      syncLoop();
     }, [isActive]);
 
     useEffect(() => {
@@ -429,7 +437,6 @@ export const ForceFieldBackground = forwardRef<ForceFieldBackgroundHandle, Force
         let lastNoiseScale = -1;
         let lastDensity = -1;
         let lastInvertImage: boolean | null = null;
-        let isReducedMotion = false;
 
         // Cursor tracking
         let curX = 0;
@@ -480,10 +487,6 @@ export const ForceFieldBackground = forwardRef<ForceFieldBackgroundHandle, Force
           p.textFont('JetBrains Mono, Courier New, monospace');
           p.textAlign(p.CENTER, p.CENTER);
 
-          if (typeof window !== 'undefined' && window.matchMedia) {
-            isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          }
-
           if (originalImg) {
             processImage();
             generatePalette(propsRef.current.hue, propsRef.current.saturation);
@@ -491,8 +494,8 @@ export const ForceFieldBackground = forwardRef<ForceFieldBackgroundHandle, Force
             generatePoints();
           }
 
-          // Initialize loop state based on isActive prop
-          if (!propsRef.current.isActive) {
+          // Render one static frame when motion is reduced or the canvas is inactive.
+          if (!propsRef.current.isActive || isReducedMotionRef.current || document.hidden) {
             p.noLoop();
             isLoopingRef.current = false;
           } else {
@@ -892,7 +895,7 @@ export const ForceFieldBackground = forwardRef<ForceFieldBackgroundHandle, Force
 
           // ── Binary Flip Cadence ───────────────────────────────────────────────
           const nowSec = p.millis() * 0.001;
-          if (!isReducedMotion) {
+          if (!isReducedMotionRef.current) {
             // Check flip timers across particles
             for (let i = 0; i < ptCount; i++) {
               if (nowSec > ptFlipTime[i]) {
@@ -967,6 +970,7 @@ export const ForceFieldBackground = forwardRef<ForceFieldBackgroundHandle, Force
         if (!document.hidden) {
           isResumePendingRef.current = true;
         }
+        syncLoop();
       };
       if (typeof document !== 'undefined') {
         document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -989,7 +993,7 @@ export const ForceFieldBackground = forwardRef<ForceFieldBackgroundHandle, Force
         window.addEventListener('scroll', updateCachedRect, { passive: true });
 
         handlePointerMove = (e: MouseEvent | TouchEvent) => {
-          if (!propsRef.current.isActive) return;
+          if (!propsRef.current.isActive || isReducedMotionRef.current) return;
           pointerState.lastActivityMs = performance.now();
           if ('touches' in e && e.touches.length > 0) {
             pointerState.x = e.touches[0].clientX - cachedLeft;

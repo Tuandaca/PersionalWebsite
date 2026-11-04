@@ -94,7 +94,7 @@ export function ScrollReveal({
     <div
       ref={ref}
       style={{
-        transitionDelay: isReducedMotion ? '0ms' : `${Math.min(180, Math.max(0, delay))}ms`,
+        transitionDelay: isReducedMotion ? '0ms' : `${Math.min(500, Math.max(0, delay))}ms`,
       }}
       className={`scroll-reveal transition-[transform,opacity] duration-[520ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${getTransformClass()} ${className}`}
     >
