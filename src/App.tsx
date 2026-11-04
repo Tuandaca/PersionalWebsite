@@ -153,7 +153,7 @@ const PROJECTS: ProjectItem[] = [
     title: 'Gaming Mouse — Premium Product Landing Page',
     badge: 'Frontend / Product Experience',
     description:
-      'Responsive gaming mouse product landing showcase with hover-driven cards and an ergonomic feature breakdown.',
+      'Responsive gaming mouse product landing showcase with hover-driven cards, product specifications, and feature highlights.',
     tech: ['React 18', 'TypeScript', 'Vite', 'Tailwind CSS', 'shadcn/ui', 'Radix UI', 'React Router'],
     github: 'https://github.com/Tuandaca/gamingmouse',
     liveUrl: 'https://gamingmouse.lovable.app/',
@@ -459,7 +459,7 @@ const HeroSection = React.memo(function HeroSection({
       </div>
 
       {/* Scroll hint */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[2] flex flex-col items-center gap-2 text-zinc-400 text-xs animate-fade-in pointer-events-none select-none" style={{ animationDelay: '1s' }}>
+      <div className="hero-scroll-hint absolute bottom-8 left-1/2 -translate-x-1/2 z-[2] flex flex-col items-center gap-2 text-zinc-400 text-xs animate-fade-in pointer-events-none select-none" style={{ animationDelay: '1s' }}>
         <span className="font-mono tracking-widest uppercase text-[#00ff87]/80">scroll</span>
         <div className="w-px h-10 bg-gradient-to-b from-[#00ff87]/80 to-transparent" />
       </div>
@@ -505,7 +505,7 @@ const AboutSection = React.memo(function AboutSection() {
             {/* Quick stats */}
             <div className="grid grid-cols-3 gap-2 sm:gap-5">
               {[
-                { val: '2+', label: 'Years Coding' },
+                { val: '.NET', label: 'Backend APIs' },
                 { val: 'Core', label: 'Full-Stack Stack' },
                 { val: 'B2', label: 'English (Aptis)' },
               ].map((s, i) => (

@@ -519,6 +519,11 @@ textarea:focus-visible,
   box-shadow: 0 0 0 2px #020704, 0 0 0 4px #00ff87;
 }
 
+/* Keep the decorative scroll hint clear of the Hero actions on short screens. */
+@media (max-height: 700px) {
+  .hero-scroll-hint { display: none; }
+}
+
 /* ===== PREFERS-REDUCED-MOTION OVERRIDES ===== */
 @media (prefers-reduced-motion: reduce) {
   .galaxy-band,
