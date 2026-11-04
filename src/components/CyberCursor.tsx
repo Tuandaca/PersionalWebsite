@@ -5,10 +5,10 @@ import React, { useEffect, useRef, useState } from 'react';
  *
  * Restrained futuristic neon-green cyber cursor active exclusively on fine pointer devices.
  * - Tiny 5px bright green inner dot tracking pointer immediately.
- * - Soft 32px glowing outer ring following with smooth damped lerp.
+ * - Soft 26px outer ring following with smooth damped lerp.
  * - Expands to ~48px with cyber glow over interactive elements (a, button, .bento-card, etc.).
  * - Non-blocking pointer-events-none, strictly zero interference with text selection.
- * - Auto-disabled on touch and coarse pointer devices.
+ * - Auto-disabled on touch, coarse pointer, and reduced-motion devices.
  */
 export function CyberCursor() {
   const [enabled, setEnabled] = useState<boolean>(false);
@@ -18,22 +18,27 @@ export function CyberCursor() {
   useEffect(() => {
     // Only activate on fine pointers with hover capability
     const mql = window.matchMedia('(pointer: fine) and (hover: hover)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const updateEnabled = () => {
-      setEnabled(mql.matches);
+      setEnabled(mql.matches && !reducedMotion.matches);
     };
     updateEnabled();
 
     if (mql.addEventListener) {
       mql.addEventListener('change', updateEnabled);
+      reducedMotion.addEventListener('change', updateEnabled);
     } else {
       (mql as any).addListener(updateEnabled);
+      (reducedMotion as any).addListener(updateEnabled);
     }
 
     return () => {
       if (mql.removeEventListener) {
         mql.removeEventListener('change', updateEnabled);
+        reducedMotion.removeEventListener('change', updateEnabled);
       } else {
         (mql as any).removeListener(updateEnabled);
+        (reducedMotion as any).removeListener(updateEnabled);
       }
     };
   }, []);
@@ -83,7 +88,7 @@ export function CyberCursor() {
 
       if (ringRef.current) {
         // Scale for hover / click
-        const scale = isMouseDown ? 0.85 : isHovering ? 1.5 : 1.0;
+        const scale = isMouseDown ? 0.85 : isHovering ? 1.85 : 1.0;
         ringRef.current.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%) scale(${scale})`;
       }
 
@@ -115,7 +120,7 @@ export function CyberCursor() {
         ringX = targetX;
         ringY = targetY;
         if (dotRef.current) dotRef.current.style.opacity = '1';
-        if (ringRef.current) ringRef.current.style.opacity = '1';
+        if (ringRef.current) ringRef.current.style.opacity = '0.35';
         startLoop();
       }
 
@@ -129,6 +134,7 @@ export function CyberCursor() {
         isHovering = nextHovering;
         if (ringRef.current) {
           ringRef.current.classList.toggle('is-hovering', isHovering);
+          ringRef.current.style.opacity = isHovering ? '1' : '0.35';
         }
       }
       startLoop();
@@ -159,7 +165,7 @@ export function CyberCursor() {
       if (targetX < 0) return;
       isVisible = true;
       if (dotRef.current) dotRef.current.style.opacity = '1';
-      if (ringRef.current) ringRef.current.style.opacity = '1';
+      if (ringRef.current) ringRef.current.style.opacity = isHovering ? '1' : '0.35';
       startLoop();
     };
 
@@ -195,9 +201,9 @@ export function CyberCursor() {
     >
       <style>{`
         .cyber-cursor-ring {
-          border-color: rgba(0, 255, 135, 0.55);
+          border-color: rgba(0, 255, 135, 0.85);
           background-color: transparent;
-          box-shadow: 0 0 14px rgba(0, 255, 135, 0.22);
+          box-shadow: 0 0 10px rgba(0, 255, 135, 0.2);
         }
         .cyber-cursor-ring.is-hovering {
           border-color: rgba(0, 255, 135, 0.95);
@@ -205,16 +211,16 @@ export function CyberCursor() {
           box-shadow: 0 0 24px rgba(0, 255, 135, 0.45);
         }
       `}</style>
-      {/* Outer glowing ring (~32px, expands to ~48px via scale(1.5)) */}
+      {/* Outer glowing ring (26px, expands to ~48px on hover) */}
       <div
         ref={ringRef}
         style={{
-          width: '32px',
-          height: '32px',
+          width: '26px',
+          height: '26px',
           opacity: 0,
           transition: 'opacity 0.25s ease-out, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease',
         }}
-        className="cyber-cursor-ring fixed top-0 left-0 rounded-full border border-[rgba(0,255,135,0.55)] will-change-transform"
+        className="cyber-cursor-ring fixed top-0 left-0 rounded-full border will-change-transform"
       />
 
       {/* Inner pinpoint dot (~5px, bright #00FF87) */}

@@ -118,7 +118,7 @@ assert(componentCode.includes('ptVelX[i] *= fr'), 'Component.tsx must preserve f
 // 3.5 Lifecycle preservation
 assert(componentCode.includes('useImperativeHandle(ref, () => ({'), 'Component.tsx must expose imperative handle');
 assert(componentCode.includes('p5InstanceRef.current.noLoop()'), 'Component.tsx must pause draw loop with p.noLoop()');
-assert(componentCode.includes('p5InstanceRef.current.loop()'), 'Component.tsx must resume draw loop with p.loop()');
+assert(componentCode.includes('p5Inst.loop()'), 'Component.tsx must resume draw loop with p.loop()');
 assert(appTsxCode.includes('isActive={isP5Active}'), 'App.tsx must bind isP5Active lifecycle');
 
 console.log('✓ Test 3 Passed: Hacker glyphs, density governance, physics, and lifecycle verified.');

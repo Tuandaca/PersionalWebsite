@@ -307,6 +307,9 @@ html.dark {
   transform: translateY(-1px);
   box-shadow: 0 0 30px rgba(0, 255, 135, 0.35);
 }
+.shiny-cta:focus-visible {
+  box-shadow: 0 0 0 2px #020704, 0 0 0 4px #00ff87, 0 0 30px rgba(0, 255, 135, 0.35);
+}
 
 .shiny-cta::before {
   content: '';
