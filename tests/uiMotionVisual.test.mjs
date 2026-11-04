@@ -44,7 +44,8 @@ assert(appTsx.includes('canvas-overlay'), 'p5 canvas overlay must be preserved')
 // Personal content and CV download preservation
 assert(appTsx.includes('NgoAnhTuan_FullStack_Eng.pdf'), 'CV download link must be preserved');
 assert(appTsx.includes('Ngo Anh Tuan'), 'Name must be preserved');
-assert(appTsx.includes('Full-Stack Engineer'), 'Title must be preserved');
+assert(appTsx.includes('Full-Stack Software Engineer'), 'Exact career title must be preserved');
+assert(!appTsx.includes('Full-Stack Engineer'), 'Shortened career title must not remain');
 assert(appTsx.includes('Ton Duc Thang University'), 'Education must be preserved');
 assert(appTsx.includes('Van Lang University'), 'Experience must be preserved');
 assert(appTsx.includes('https://github.com/Tuandaca/DACNTT'), 'Travel AI repo link must be preserved');

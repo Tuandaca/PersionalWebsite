@@ -171,7 +171,7 @@ const EXPERIENCES = [
     location: 'Ho Chi Minh City',
     period: '2025 – 2026',
     bullets: [
-      'Developed an internal web portal enabling students to look up academic information and resolve academic affairs.',
+      'Contributed to developing an internal web portal enabling students to look up academic information and resolve academic affairs.',
       'Analyzed business requirements and designed system artifacts: Use Case, Class, and Sequence Diagrams.',
       'Built backend RESTful APIs with ASP.NET Core, responsive UI with Vue.js, and managed SQL Server schemas.',
     ],
@@ -240,7 +240,7 @@ const Navbar = React.memo(function Navbar({ menuOpen, setMenuOpen }: { menuOpen:
   return (
     <header className="fixed top-0 left-0 w-full z-50 pt-5 px-4 sm:px-6">
       <nav
-        className={`max-w-6xl mx-auto flex items-center justify-between px-6 sm:px-8 py-3.5 sm:py-4 rounded-full relative overflow-hidden liquid-glass-nav ${scrolled ? 'is-scrolled' : ''}`}
+        className={`max-w-6xl mx-auto flex items-center justify-between px-5 sm:px-8 py-3.5 sm:py-4 rounded-full relative overflow-hidden liquid-glass-nav ${scrolled ? 'is-scrolled' : ''}`}
       >
         {/* Specular sheen highlight along top rim */}
         <div className="absolute inset-x-8 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#00ff87]/50 to-transparent pointer-events-none" />
@@ -264,7 +264,7 @@ const Navbar = React.memo(function Navbar({ menuOpen, setMenuOpen }: { menuOpen:
         </a>
 
         {/* Desktop links - liquid glow capsule */}
-        <div className="hidden lg:flex items-center gap-2">
+        <div className="hidden lg:flex items-center gap-1 xl:gap-2">
           {NAV_LINKS.map((l) => {
             const isActive = activeSection === l.href;
             return (
@@ -272,7 +272,7 @@ const Navbar = React.memo(function Navbar({ menuOpen, setMenuOpen }: { menuOpen:
                 key={l.href}
                 href={l.href}
                 id={`nav-${l.label.toLowerCase()}-link`}
-                className={`relative text-base font-semibold transition-all duration-200 tracking-wide py-1.5 px-4 rounded-full ${
+                className={`relative text-sm xl:text-base font-semibold transition-all duration-200 tracking-wide py-1.5 px-3 xl:px-4 rounded-full ${
                   isActive
                     ? 'liquid-nav-link-active font-bold'
                     : 'text-zinc-300 hover:text-[#00ff87] hover:bg-white/5'
@@ -286,10 +286,10 @@ const Navbar = React.memo(function Navbar({ menuOpen, setMenuOpen }: { menuOpen:
 
         {/* CTA */}
         <div className="hidden sm:flex items-center gap-3">
-                    <a
-            href="mailto:ngoanhtuan23.it@gmail.com"
+          <a
+            href="#contact"
             id="nav-hire-btn"
-            className="nav-cta relative group inline-flex items-center gap-2.5 overflow-hidden rounded-full bg-white/5 px-7 py-3 transition-all active:scale-95 hover:bg-white/10"
+            className="nav-cta relative group inline-flex items-center gap-2.5 overflow-hidden rounded-full bg-white/5 px-5 xl:px-7 py-3 transition-all active:scale-95 hover:bg-white/10"
           >
             <span className="absolute inset-[-100%] group-hover:animate-[spin_3s_linear_infinite] group-focus-visible:animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_75%,#00ff87_100%)] opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity" />
             <span className="absolute inset-[1px] rounded-full bg-black" />
@@ -331,8 +331,9 @@ const Navbar = React.memo(function Navbar({ menuOpen, setMenuOpen }: { menuOpen:
               </a>
             );
           })}
-                    <a
-            href="mailto:ngoanhtuan23.it@gmail.com"
+          <a
+            href="#contact"
+            onClick={() => setMenuOpen(false)}
             className="mt-6 flex items-center justify-center gap-2.5 w-full py-4 rounded-full bg-[#00ff87] text-black text-base font-bold shadow-[0_0_25px_rgba(0,255,135,0.4)]"
           >
             Hire Me <ArrowRight className="w-4 h-4" />
@@ -355,7 +356,7 @@ const HeroSection = React.memo(function HeroSection({
   visualsReady?: boolean;
 }) {
   return (
-    <section id="hero" className="relative z-10 min-h-screen flex flex-col items-center justify-center pt-28 pb-20 px-6 overflow-hidden">
+    <section id="hero" className="relative z-10 min-h-screen flex flex-col items-center justify-center pt-28 pb-20 px-4 sm:px-6 overflow-hidden">
       {/* ForceField Canvas with dynamic lifecycle mutual exclusion and crossfade */}
       <div
         className="canvas-overlay"
@@ -393,14 +394,14 @@ const HeroSection = React.memo(function HeroSection({
       <div className="relative z-[2] text-center max-w-4xl mx-auto content-shield">
         {/* Status badge */}
         <div
-          className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-black/60 border border-[#00ff87]/30 backdrop-blur-md mb-8 animate-fade-up shadow-[0_0_20px_rgba(0,255,135,0.15)] pointer-events-none select-none"
+          className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-2 rounded-full bg-black/60 border border-[#00ff87]/30 backdrop-blur-md mb-6 sm:mb-8 animate-fade-up shadow-[0_0_20px_rgba(0,255,135,0.15)] pointer-events-none select-none"
           style={{ animationDelay: '0.1s' }}
         >
           <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff87] opacity-75" />
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00ff87] shadow-[0_0_8px_#00ff87]" />
           </span>
-          <span className="text-sm font-semibold text-emerald-200 tracking-wide font-space">
+          <span className="text-xs sm:text-sm font-semibold text-emerald-200 tracking-wide font-space">
             Open to full-time opportunities · Ho Chi Minh City, Vietnam
           </span>
           <ChevronRight className="w-3.5 h-3.5 text-[#00ff87]" />
@@ -408,19 +409,19 @@ const HeroSection = React.memo(function HeroSection({
 
         {/* Name & Title */}
         <h1
-          className="font-space text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[1.05] mb-6 animate-fade-up"
+          className="font-space text-[clamp(2.65rem,12vw,3.5rem)] sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[1.05] mb-6 animate-fade-up"
           style={{ animationDelay: '0.2s' }}
         >
           <span className="block text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/60">
             Ngo Anh Tuan
           </span>
-          <span className="block text-[#00ff87] green-glow text-4xl sm:text-5xl md:text-6xl font-extrabold mt-3">
-            Full-Stack Engineer
+          <span className="block text-[#00ff87] green-glow text-[clamp(1.55rem,6.5vw,2.4rem)] sm:text-5xl md:text-6xl font-extrabold mt-3">
+            Full-Stack Software Engineer
           </span>
         </h1>
 
         <p
-          className="text-xl sm:text-2xl text-zinc-200 max-w-3xl mx-auto mb-10 leading-relaxed font-normal animate-fade-up"
+          className="text-base sm:text-2xl text-zinc-200 max-w-3xl mx-auto mb-8 sm:mb-10 leading-relaxed font-normal animate-fade-up"
           style={{ animationDelay: '0.3s' }}
         >
           Software Engineering candidate building robust, scalable digital products —
@@ -431,7 +432,7 @@ const HeroSection = React.memo(function HeroSection({
 
         {/* CTAs */}
         <div
-          className="flex flex-col sm:flex-row items-center justify-center gap-5 animate-fade-up"
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 animate-fade-up"
           style={{ animationDelay: '0.4s' }}
         >
           <a
@@ -455,24 +456,6 @@ const HeroSection = React.memo(function HeroSection({
           </a>
         </div>
 
-        {/* Quick contact strip */}
-        <div
-          className="mt-14 flex flex-wrap items-center justify-center gap-8 text-base text-zinc-300 font-medium animate-fade-up"
-          style={{ animationDelay: '0.55s' }}
-        >
-          <a href="mailto:ngoanhtuan23.it@gmail.com" className="flex items-center gap-2 hover:text-[#00ff87] transition-colors">
-            <Mail className="w-4 h-4 text-[#00ff87]" />
-            ngoanhtuan23.it@gmail.com
-          </a>
-          <a href="https://github.com/Tuandaca" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#00ff87] transition-colors">
-            <Github className="w-4 h-4 text-[#00ff87]" />
-            github.com/Tuandaca
-          </a>
-          <span className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-[#00ff87]" />
-            Ho Chi Minh City, Vietnam
-          </span>
-        </div>
       </div>
 
       {/* Scroll hint */}
@@ -499,7 +482,7 @@ const AboutSection = React.memo(function AboutSection() {
             <ScrollReveal delay={80}>
               <h2 className="font-space text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-7 text-white">
                 Turning ideas into{' '}
-                <span className="text-[#00ff87] green-glow">production-grade</span> software.
+                <span className="text-[#00ff87] green-glow">reliable</span> software.
               </h2>
             </ScrollReveal>
             <ScrollReveal delay={160}>
@@ -515,21 +498,21 @@ const AboutSection = React.memo(function AboutSection() {
                 My core expertise lies in <span className="text-white font-semibold">backend architecture</span>,{' '}
                 <span className="text-white font-semibold">RESTful API design</span>, and{' '}
                 <span className="text-white font-semibold">database modeling</span> — while staying comfortable across the full
-                stack from database to UI. I'm eager to contribute to teams shipping impactful digital products at scale.
+                stack from database to UI. I'm eager to contribute to teams building useful digital products.
               </p>
             </ScrollReveal>
 
             {/* Quick stats */}
-            <div className="grid grid-cols-3 gap-5">
+            <div className="grid grid-cols-3 gap-2 sm:gap-5">
               {[
                 { val: '2+', label: 'Years Coding' },
                 { val: 'Core', label: 'Full-Stack Stack' },
                 { val: 'B2', label: 'English (Aptis)' },
               ].map((s, i) => (
                 <ScrollReveal key={s.label} delay={300 + i * 80}>
-                  <div className="text-center p-5 border border-[#00ff87]/20 rounded-2xl bg-black/40 shadow-[0_0_20px_rgba(0,255,135,0.06)]">
-                    <div className="text-3xl md:text-4xl font-black font-space text-[#00ff87]">{s.val}</div>
-                    <div className="text-sm text-zinc-300 mt-1 font-medium">{s.label}</div>
+                  <div className="text-center px-1 py-4 sm:p-5 min-w-0 border border-[#00ff87]/20 rounded-2xl bg-black/40 shadow-[0_0_20px_rgba(0,255,135,0.06)]">
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-black font-space text-[#00ff87]">{s.val}</div>
+                    <div className="text-xs sm:text-sm text-zinc-300 mt-1 font-medium leading-snug break-words">{s.label}</div>
                   </div>
                 </ScrollReveal>
               ))}
@@ -560,13 +543,14 @@ const AboutSection = React.memo(function AboutSection() {
                   </div>
 
                   <p className="font-space font-bold text-white text-2xl tracking-tight">Ngo Anh Tuan</p>
-                  <p className="text-zinc-300 text-base mt-1 font-medium">Full-Stack Engineer</p>
+                  <p className="text-zinc-300 text-sm sm:text-base mt-1 font-medium text-center">Full-Stack Software Engineer</p>
                   <p className="text-xs text-zinc-400 mt-2 flex items-center gap-1 font-mono">
                     <MapPin className="w-3.5 h-3.5 text-[#00ff87]" /> Ho Chi Minh City, Vietnam
                   </p>
 
-                  {/* 6 Glass Social & Contact Buttons (Responsive 3x2 Grid) */}
+                  {/* Professional channels first in visual and keyboard order */}
                   <div className="grid grid-cols-3 gap-3 sm:gap-3.5 mt-6 w-full max-w-[240px] place-items-center">
+                    <p className="col-span-3 justify-self-start text-[11px] font-mono uppercase tracking-widest text-[#00ff87]">Professional</p>
                     {/* GitHub */}
                     <a
                       href="https://github.com/Tuandaca"
@@ -582,6 +566,29 @@ const AboutSection = React.memo(function AboutSection() {
                       </svg>
                     </a>
 
+                    {/* Email */}
+                    <a
+                      href="mailto:ngoanhtuan23.it@gmail.com"
+                      id="about-email-link"
+                      aria-label="Email Ngo Anh Tuan (ngoanhtuan23.it@gmail.com)"
+                      className="group relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/[0.04] backdrop-blur-md border border-white/10 text-zinc-300 transition-all duration-300 ease-out overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00ff87] focus-visible:ring-offset-2 focus-visible:ring-offset-[#010503] active:scale-95 hover:scale-110 hover:-rotate-6 hover:text-white hover:border-[#00ff87]/60 hover:bg-[#00ff87]/10 hover:shadow-[0_0_24px_rgba(0,255,135,0.35)]"
+                    >
+                      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out pointer-events-none bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-25deg]" />
+                      <Mail className="w-5 h-5 transition-colors" />
+                    </a>
+
+                    {/* Phone */}
+                    <a
+                      href="tel:+84917940833"
+                      id="about-phone-link"
+                      aria-label="Call Ngo Anh Tuan (+84 917 940 833)"
+                      className="group relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/[0.04] backdrop-blur-md border border-white/10 text-zinc-300 transition-all duration-300 ease-out overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00ff87] focus-visible:ring-offset-2 focus-visible:ring-offset-[#010503] active:scale-95 hover:scale-110 hover:rotate-6 hover:text-white hover:border-[#00ff87]/60 hover:bg-[#00ff87]/10 hover:shadow-[0_0_24px_rgba(0,255,135,0.35)]"
+                    >
+                      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out pointer-events-none bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-25deg]" />
+                      <Phone className="w-5 h-5 transition-colors" />
+                    </a>
+
+                    <p className="col-span-3 justify-self-start mt-2 pt-3 w-full border-t border-white/10 text-[11px] font-mono uppercase tracking-widest text-zinc-500">Elsewhere</p>
                     {/* Facebook */}
                     <a
                       href="https://web.facebook.com/ngobongsu"
@@ -629,27 +636,6 @@ const AboutSection = React.memo(function AboutSection() {
                       </svg>
                     </a>
 
-                    {/* Email */}
-                    <a
-                      href="mailto:ngoanhtuan23.it@gmail.com"
-                      id="about-email-link"
-                      aria-label="Email Ngo Anh Tuan (ngoanhtuan23.it@gmail.com)"
-                      className="group relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/[0.04] backdrop-blur-md border border-white/10 text-zinc-300 transition-all duration-300 ease-out overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00ff87] focus-visible:ring-offset-2 focus-visible:ring-offset-[#010503] active:scale-95 hover:scale-110 hover:-rotate-6 hover:text-white hover:border-[#00ff87]/60 hover:bg-[#00ff87]/10 hover:shadow-[0_0_24px_rgba(0,255,135,0.35)]"
-                    >
-                      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out pointer-events-none bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-25deg]" />
-                      <Mail className="w-5 h-5 transition-colors" />
-                    </a>
-
-                    {/* Phone */}
-                    <a
-                      href="tel:+84917940833"
-                      id="about-phone-link"
-                      aria-label="Call Ngo Anh Tuan (+84 917 940 833)"
-                      className="group relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/[0.04] backdrop-blur-md border border-white/10 text-zinc-300 transition-all duration-300 ease-out overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00ff87] focus-visible:ring-offset-2 focus-visible:ring-offset-[#010503] active:scale-95 hover:scale-110 hover:rotate-6 hover:text-white hover:border-[#00ff87]/60 hover:bg-[#00ff87]/10 hover:shadow-[0_0_24px_rgba(0,255,135,0.35)]"
-                    >
-                      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out pointer-events-none bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-25deg]" />
-                      <Phone className="w-5 h-5 transition-colors" />
-                    </a>
                   </div>
                 </div>
               </div>
@@ -719,36 +705,15 @@ const ExperienceSection = React.memo(function ExperienceSection() {
           </ScrollReveal>
         </div>
 
-        {/* Education card */}
-        <ScrollReveal delay={140}>
-          <div className="bento-card p-7 mb-8 flex items-start gap-5">
-            <div className="shrink-0 p-3.5 rounded-xl bg-[#00ff87]/10 border border-[#00ff87]/30 text-[#00ff87]">
-              <GraduationCap className="w-6 h-6" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-start justify-between flex-wrap gap-2">
-                <div>
-                  <h3 className="font-space font-bold text-white text-xl">B.Sc. Software Engineering</h3>
-                  <p className="text-zinc-200 text-base mt-1">Ton Duc Thang University, Ho Chi Minh City</p>
-                </div>
-                <span className="text-sm font-mono text-[#00ff87] shrink-0 pt-1 font-semibold">2021 – 2026</span>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-4">
-                <span className="skill-pill text-amber-300 bg-amber-400/10 border-amber-400/30"><Award className="w-3.5 h-3.5 text-amber-400" /> Aptis ESOL B2 (2024)</span>
-              </div>
-            </div>
-          </div>
-        </ScrollReveal>
-
-        {/* Work experience */}
+        {/* Engineering experience leads the section */}
         <div className="relative pl-7 space-y-8">
           <div className="timeline-line" />
           {EXPERIENCES.map((exp, i) => (
             <div key={i} className="relative">
               {/* Dot */}
-              <div className="absolute -left-[35px] top-6 w-4 h-4 rounded-full bg-[#00ff87] border-2 border-black ring-4 ring-[#00ff87]/25 shadow-[0_0_12px_#00ff87]" />
+              <div className={`absolute -left-[35px] top-6 w-4 h-4 rounded-full border-2 border-black ${i === 0 ? 'bg-[#00ff87] ring-4 ring-[#00ff87]/25 shadow-[0_0_12px_#00ff87]' : 'bg-zinc-500 ring-4 ring-white/5'}`} />
               <ScrollReveal delay={220 + i * 120}>
-                <div className="bento-card p-7">
+                <div className={`bento-card p-7 ${i === 0 ? 'border-[#00ff87]/30' : 'opacity-85'}`}>
                   <div className="flex items-start justify-between flex-wrap gap-2 mb-4">
                     <div className="flex items-start gap-3.5">
                       <div className="shrink-0 p-2.5 rounded-lg bg-white/5 border border-white/10 text-[#00ff87] mt-0.5">
@@ -756,6 +721,7 @@ const ExperienceSection = React.memo(function ExperienceSection() {
                       </div>
                       <div>
                         <h3 className="font-space font-bold text-white text-lg sm:text-xl">{exp.role}</h3>
+                        {i === 0 && <span className="inline-block mt-1 text-xs font-mono uppercase tracking-widest text-[#00ff87]">Engineering internship</span>}
                         <p className="text-zinc-300 text-base mt-0.5 font-medium">
                           {exp.company}
                           <span className="mx-2 text-zinc-600">·</span>
@@ -783,6 +749,27 @@ const ExperienceSection = React.memo(function ExperienceSection() {
             </div>
           ))}
         </div>
+
+        {/* Education and certification follow practical experience */}
+        <ScrollReveal delay={460}>
+          <div className="bento-card p-6 sm:p-7 mt-8 flex items-start gap-4 sm:gap-5">
+            <div className="shrink-0 p-3.5 rounded-xl bg-white/5 border border-white/10 text-[#00ff87]">
+              <GraduationCap className="w-6 h-6" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between flex-wrap gap-2">
+                <div>
+                  <h3 className="font-space font-bold text-white text-xl">B.Sc. Software Engineering</h3>
+                  <p className="text-zinc-200 text-base mt-1">Ton Duc Thang University, Ho Chi Minh City</p>
+                </div>
+                <span className="text-sm font-mono text-zinc-400 shrink-0 pt-1 font-semibold">2021 – 2026</span>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-4">
+                <span className="skill-pill text-amber-300 bg-amber-400/10 border-amber-400/30"><Award className="w-3.5 h-3.5 text-amber-400" /> Aptis ESOL B2 (2024)</span>
+              </div>
+            </div>
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );
